@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "id": "freecam_legit",
+  "version": "${version}",
+  "name": "Freecam Legit",
+  "description": "Легитимный фрикам для VanillaSquad — без wall-hack, без noclip",
+  "authors": ["PanicS_Knight"],
+  "contact": {
+    "homepage": "https://github.com/PanicS_Knight/freecam-legit"
+  },
+  "license": "MIT",
+  "icon": "assets/freecam_legit/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "org.PanicS_Knight.freecam_legit.client.FreecamClient"
+    ]
+  },
+  "mixins": [
+    {
+      "config": "freecam_legit.client.mixins.json",
+      "environment": "client"
+    }
+  ],
+  "depends": {
+    "fabricloader": ">=0.18.0",
+    "fabric-api": ">=0.129.0",
+    "minecraft": "1.21.7"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "org.PanicS_Knight.freecam_legit.client.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "client": [
+    "CameraPositionMixin",
+    "ClientPlayerEntityMixin",
+    "ClientPlayerEntityNetworkMixin",
+    "MouseMixin",
+    "MinecraftClientMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
