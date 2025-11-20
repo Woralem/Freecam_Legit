@@ -5,10 +5,10 @@
   "compatibilityLevel": "JAVA_21",
   "client": [
     "CameraPositionMixin",
-    "ClientPlayerEntityMixin",
     "ClientPlayerEntityNetworkMixin",
-    "MouseMixin",
-    "MinecraftClientMixin"
+    "KeyboardInputMixin",
+    "MinecraftClientMixin",
+    "MouseMixin"
   ],
   "injectors": {
     "defaultRequire": 1
