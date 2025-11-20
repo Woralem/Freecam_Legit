@@ -12,7 +12,7 @@ import org.PanicS_Knight.freecam_legit.config.ModConfig;
  * Handles camera movement, rotation and collision detection.
  *
  * @author PanicS_Knight
- * @version 1.0
+ * @version 1.1
  */
 public class FreecamEntity {
     // Camera dimensions (similar to player)
@@ -20,7 +20,7 @@ public class FreecamEntity {
     private static final double CAMERA_HEIGHT = 1.8;
 
     // Movement constants
-    private static final float ACCELERATION_FACTOR = 0.2f;
+    private static final float ACCELERATION_FACTOR = 0.5f;
     private static final double MIN_VELOCITY_THRESHOLD = 0.00001;
 
     // Mouse sensitivity constants
@@ -130,10 +130,8 @@ public class FreecamEntity {
             return Vec3d.ZERO;
         }
 
-        // Calculate movement vectors based on camera rotation
         Vec3d horizontalMotion = calculateHorizontalMotion(forward, strafe, speed);
 
-        // Add vertical component (pure up/down, not affected by pitch)
         return horizontalMotion.add(0, vertical * speed, 0);
     }
 
@@ -175,11 +173,12 @@ public class FreecamEntity {
 
     /**
      * Calculates horizontal motion vector based on look direction.
+     * Uses "Creative-style" flight logic (ignores pitch for WASD movement).
      *
      * @param forward forward input value
      * @param strafe strafe input value
      * @param speed movement speed
-     * @return horizontal motion vector
+     * @return horizontal motion vector (Y component is always 0)
      */
     private Vec3d calculateHorizontalMotion(float forward, float strafe, float speed) {
         // Normalize diagonal movement to prevent faster movement
@@ -191,16 +190,16 @@ public class FreecamEntity {
 
         // Convert rotation to radians
         float yawRad = (float) Math.toRadians(this.yaw);
-        float pitchRad = (float) Math.toRadians(this.pitch);
 
-        // Calculate look direction vector
-        Vec3d lookDir = new Vec3d(
-                -Math.sin(yawRad) * Math.cos(pitchRad),
-                -Math.sin(pitchRad),
-                Math.cos(yawRad) * Math.cos(pitchRad)
+        // Creative Flight Logic:
+        Vec3d forwardDir = new Vec3d(
+                -Math.sin(yawRad),
+                0,
+                Math.cos(yawRad)
         );
 
-        // Calculate right vector (perpendicular to look direction)
+        // Calculate Right direction (Perpendicular to forward)
+        // X = cos(yaw), Z = sin(yaw)
         Vec3d rightDir = new Vec3d(
                 Math.cos(yawRad),
                 0,
@@ -208,14 +207,9 @@ public class FreecamEntity {
         );
 
         // Combine forward and strafe movement
-        Vec3d motion = lookDir.multiply(forward).add(rightDir.multiply(strafe));
+        Vec3d motion = forwardDir.multiply(forward).add(rightDir.multiply(strafe));
 
-        // Normalize and apply speed
-        if (motion.lengthSquared() > 0) {
-            motion = motion.normalize().multiply(speed);
-        }
-
-        return motion;
+        return motion.multiply(speed);
     }
 
     /**
