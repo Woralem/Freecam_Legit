@@ -9,10 +9,10 @@ import org.PanicS_Knight.freecam_legit.config.ModConfig;
 
 /**
  * Represents the freecam virtual camera entity.
- * Handles camera movement, rotation and collision detection.
+ * Handles camera movement, rotation, physics, and collision detection.
  *
  * @author PanicS_Knight
- * @version 1.1
+ * @version 1.2
  */
 public class FreecamEntity {
     // Camera dimensions (similar to player)
@@ -86,7 +86,7 @@ public class FreecamEntity {
 
     /**
      * Ticks the camera entity.
-     * Updates position based on input and applies collision detection.
+     * Updates position based on input, applies block collisions, and enforces distance limits.
      */
     public void tick() {
         if (client.player == null) {
@@ -102,8 +102,11 @@ public class FreecamEntity {
         // Smoothly accelerate/decelerate towards target velocity
         this.velocity = velocity.lerp(targetVelocity, ACCELERATION_FACTOR);
 
-        // Apply movement with collision detection
+        // 1. Apply movement with standard block collisions
         applyMovementWithCollisions();
+
+        // 2. Apply "Sphere Collision" (Max distance constraint)
+        applyDistanceConstraint();
     }
 
     /**
@@ -130,8 +133,10 @@ public class FreecamEntity {
             return Vec3d.ZERO;
         }
 
+        // Calculate movement vectors based on camera rotation
         Vec3d horizontalMotion = calculateHorizontalMotion(forward, strafe, speed);
 
+        // Add vertical component (pure up/down, not affected by pitch)
         return horizontalMotion.add(0, vertical * speed, 0);
     }
 
@@ -199,7 +204,6 @@ public class FreecamEntity {
         );
 
         // Calculate Right direction (Perpendicular to forward)
-        // X = cos(yaw), Z = sin(yaw)
         Vec3d rightDir = new Vec3d(
                 Math.cos(yawRad),
                 0,
@@ -234,6 +238,38 @@ public class FreecamEntity {
                 boundingBox,
                 client.world
         );
+    }
+
+    /**
+     * Limits the camera distance from the player using "Sphere Collision" logic.
+     * Acts as a solid spherical barrier: clamps position and cancels outward velocity.
+     * This prevents the camera from snapping back violently.
+     */
+    private void applyDistanceConstraint() {
+        if (client.player == null) return;
+
+        Vec3d anchor = client.player.getPos();
+        Vec3d offset = this.position.subtract(anchor);
+        double distance = offset.length();
+        double maxDist = ModConfig.getInstance().maxDistance;
+
+        // If we are outside or exactly at the boundary
+        if (distance > maxDist) {
+            // 1. Clamp Position: Place camera exactly on the sphere surface
+            Vec3d direction = offset.normalize();
+            this.position = anchor.add(direction.multiply(maxDist));
+
+            // 2. Project Velocity: "Slide" along the wall
+            // We remove the component of velocity that pushes us OUT of the sphere.
+            // Formula: V_new = V_old - (V_old . Normal) * Normal
+            double dotProduct = this.velocity.dotProduct(direction);
+
+            // Only modify velocity if we are actually moving AWAY (dotProduct > 0)
+            if (dotProduct > 0) {
+                Vec3d outwardComponent = direction.multiply(dotProduct);
+                this.velocity = this.velocity.subtract(outwardComponent);
+            }
+        }
     }
 
     /**

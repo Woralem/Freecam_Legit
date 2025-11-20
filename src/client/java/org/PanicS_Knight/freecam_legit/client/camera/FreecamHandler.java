@@ -4,16 +4,15 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.Perspective;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.Vec3d;
-import org.PanicS_Knight.freecam_legit.config.ModConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * Central handler for freecam state management.
- * Manages camera lifecycle, player freezing, and distance constraints.
+ * Manages camera lifecycle, player freezing, and global state.
  *
  * @author PanicS_Knight
- * @version 1.0
+ * @version 1.1
  */
 public final class FreecamHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger("FreecamLegit/Handler");
@@ -120,7 +119,7 @@ public final class FreecamHandler {
 
     /**
      * Ticks the freecam handler.
-     * Enforces player position freeze and camera distance limits.
+     * Enforces player position freeze and updates camera physics.
      * Should be called every client tick.
      *
      * @param client minecraft client instance
@@ -133,10 +132,7 @@ public final class FreecamHandler {
         // Freeze player at saved horizontal position (allow vertical movement from gravity)
         freezePlayer(client);
 
-        // Enforce maximum camera distance from player
-        enforceDistanceLimit(client);
-
-        // Update camera position and rotation
+        // Update camera position and physics (including collision and distance limits)
         cameraEntity.tick();
     }
 
@@ -162,31 +158,6 @@ public final class FreecamHandler {
         // Freeze rotation
         client.player.setYaw(frozenYaw);
         client.player.setPitch(frozenPitch);
-    }
-
-    /**
-     * Enforces maximum distance constraint between camera and player.
-     * Clamps camera position if it exceeds configured maximum distance.
-     *
-     * @param client minecraft client instance
-     */
-    private static void enforceDistanceLimit(MinecraftClient client) {
-        assert client.player != null;
-        Vec3d playerPos = client.player.getPos();
-        Vec3d cameraPos = cameraEntity.getPos();
-
-        double distance = cameraPos.distanceTo(playerPos);
-        int maxDistance = ModConfig.getInstance().maxDistance;
-
-        if (distance > maxDistance) {
-            // Calculate clamped position at exactly max distance
-            Vec3d direction = cameraPos.subtract(playerPos).normalize();
-            Vec3d clampedPos = playerPos.add(direction.multiply(maxDistance));
-
-            cameraEntity.setPosition(clampedPos);
-
-            LOGGER.debug("Camera distance clamped: {} -> {}", distance, maxDistance);
-        }
     }
 
     /**
