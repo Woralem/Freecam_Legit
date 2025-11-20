@@ -296,17 +296,6 @@ public class FreecamEntity {
     }
 
     /**
-     * Forcefully sets camera position.
-     * Resets interpolation to prevent visual jumps.
-     *
-     * @param pos new position
-     */
-    public void setPosition(Vec3d pos) {
-        this.position = pos;
-        this.prevPosition = pos;
-    }
-
-    /**
      * Gets current yaw rotation.
      *
      * @return yaw in degrees
