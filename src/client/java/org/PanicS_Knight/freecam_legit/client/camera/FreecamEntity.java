@@ -53,7 +53,7 @@ public class FreecamEntity {
      */
     public FreecamEntity(ClientPlayerEntity player) {
         this.client = MinecraftClient.getInstance();
-        this.position = player.getPos();
+        this.position = player.getEntityPos();
         this.prevPosition = position;
         this.yaw = player.getYaw();
         this.pitch = player.getPitch();
@@ -248,7 +248,7 @@ public class FreecamEntity {
     private void applyDistanceConstraint() {
         if (client.player == null) return;
 
-        Vec3d anchor = client.player.getPos();
+        Vec3d anchor = client.player.getEntityPos();
         Vec3d offset = this.position.subtract(anchor);
         double distance = offset.length();
         double maxDist = ModConfig.getInstance().maxDistance;

@@ -48,7 +48,7 @@ public final class FreecamHud {
         // Calculate distance from player to camera
         double distance = FreecamHandler.getCameraEntity()
                 .getPos()
-                .distanceTo(client.player.getPos());
+                .distanceTo(client.player.getEntityPos());
 
         // Format status text
         String statusText = String.format("§e§lFREECAM §r§7(%.1fm)", distance);

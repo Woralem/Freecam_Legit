@@ -14,7 +14,6 @@ import org.lwjgl.glfw.GLFW;
  * @version 1.0
  */
 public final class KeyBindings {
-    private static final String CATEGORY = "key.category.freecam_legit";
     private static final String TOGGLE_KEY = "key.freecam_legit.toggle";
 
     /**
@@ -36,7 +35,7 @@ public final class KeyBindings {
                 TOGGLE_KEY,
                 InputUtil.Type.KEYSYM,
                 GLFW.GLFW_KEY_V,
-                CATEGORY
+                KeyBinding.Category.MISC
         ));
     }
 
